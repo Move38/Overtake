@@ -8,9 +8,7 @@
 
 namespace stateBoard {
     
-    #define FACE_ELSEWHERE FACE_COUNT + 1
     #define VIEW_STATE_NORMAL 0
-    #define VIEW_STATE_ERROR 1
     #define VIEW_STATE_RADIATE 2
     
     byte _ownership[FACE_COUNT];
@@ -18,7 +16,6 @@ namespace stateBoard {
     byte _lastFace;
     bool _isEndInitiator;
 
-    //reusable
     byte _moveIndex;
     byte _viewState;
     
@@ -50,10 +47,6 @@ namespace stateBoard {
     }
 
     void updateView() {
-        if(_viewState == VIEW_STATE_ERROR) {
-            animate::pulse(RED, 4);
-            return;
-        }
         if(_viewState == VIEW_STATE_RADIATE) {
             animate::radiate(player::getColor(_moveIndex), _playerToFaceRequests[_moveIndex], 1);
             return;
@@ -62,25 +55,15 @@ namespace stateBoard {
     }
 
     void handleViewNormalize(){
-        action::send(action::Action{.type=GAME_DEF_ACTION_MOVE_RESPONSE, .payload = _viewState == VIEW_STATE_ERROR ? 0 : 1}, _lastFace);
         _viewState = VIEW_STATE_NORMAL;
     }
     void processPlayerRequests(const stateCommon::LoopData& data){
-        if(action::isBroadcastReceived(data.action, GAME_DEF_ACTION_MOVE_TAKEN)) {
-            _playerToFaceRequests[data.action.payload] = FACE_ELSEWHERE;
-        }
         if(data.action.type == GAME_DEF_ACTION_MOVE_REQUEST && timer::runningFor()  == 0) {
             _lastFace = data.face;
             _moveIndex = player::getIndex(data.action.payload);
-            timer::mark(800, handleViewNormalize);
-            bool isInvalid = _playerToFaceRequests[_moveIndex] != FACE_COUNT || _ownership[data.face] != PLAYER_LIMIT;
-            if(isInvalid) {
-                _viewState = VIEW_STATE_ERROR;
-                return;
-            }
             _viewState = VIEW_STATE_RADIATE;
             _playerToFaceRequests[_moveIndex] = data.face;
-            action::broadcast(action::Action{.type=GAME_DEF_ACTION_MOVE_TAKEN, .payload=_moveIndex});
+            timer::mark(800, handleViewNormalize);
         }
     }
 
@@ -106,19 +89,14 @@ namespace stateBoard {
             stateCommon::handleStateChange(GAME_DEF_STATE_END);
             return true;
         }
+        if(buttonMultiClicked()) {
+            action::broadcast(action::Action{.type=GAME_DEF_ACTION_END, .payload=millis()});
+            _isEndInitiator = true;
+            timer::cancel();
+            stateCommon::handleStateChange(GAME_DEF_STATE_END);
+            return false;
+        }
         if(buttonDoubleClicked()){
-            bool allEmpty = true;
-            for(byte i =0; i < player::getCount(); i++) {
-                bool isEmpty = _playerToFaceRequests[i] == FACE_COUNT;
-                allEmpty = allEmpty && isEmpty;
-            }
-            if(allEmpty) {
-                action::broadcast(action::Action{.type=GAME_DEF_ACTION_END, .payload=millis()});
-                _isEndInitiator = true;
-                timer::cancel();
-                stateCommon::handleStateChange(GAME_DEF_STATE_END);
-                return false;
-            }
             action::broadcast(action::Action{.type=GAME_DEF_ACTION_PROGRESS, .payload = millis()});
             changeToProgress();
             return true;

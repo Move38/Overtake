@@ -3,7 +3,6 @@
 #include "animate.h"
 #include "player.h"
 #include "action.h"
-#include "state-enumerate.h"
 #include "game-def.h"
 #include "timer.h"
 namespace stateMover {
@@ -16,8 +15,12 @@ namespace stateMover {
     
     byte _currentPlayer;
 
+    void handleSendDone(){
+        _showStatus = SHOW_DONE;
+    }
     void handleDelayedSend() {
         action::send(action::Action{.type=GAME_DEF_ACTION_MOVE_REQUEST, .payload = _currentPlayer}, 0);
+        timer::mark(800, handleSendDone);
     }
 
     void handleConnectionStatus(){
@@ -32,21 +35,15 @@ namespace stateMover {
         }
     }
 
-    void handleMoveResponse(const action::Action& action){
-        if(action.type == GAME_DEF_ACTION_MOVE_RESPONSE) {
-            _showStatus = SHOW_DONE;
-            if(action.payload > 0) {
-                _currentPlayer = (_currentPlayer + 1) % player::getCount();
-            }
-        }
-    }
-
     void loop(const bool isEnter, const stateCommon::LoopData& data) {
         if(isEnter) {
             _showStatus = SHOW_IDLE;
             _currentPlayer = 0;
+            buttonSingleClicked();
         }
-        handleMoveResponse(data.action);
+        if(buttonSingleClicked()){
+            _currentPlayer = (_currentPlayer + 1) % player::getCount();
+        }
         handleConnectionStatus();
         if(_showStatus == SHOW_SENDING) {
             animate::spin(player::getColor(_currentPlayer), 4);

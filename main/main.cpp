@@ -4,8 +4,6 @@
 #include "global-events.h"
 #include "game-def.h"
 #include "state-common.h"
-#include "state-enumerate.h"
-#include "state-player-assign.h"
 #include "state-mover.h"
 #include "state-board.h"
 #include "state-progress.h"
@@ -15,10 +13,8 @@
 namespace _main_ {
     
     void setup() {
-        stateCommon::addState(stateEnumerate::loop, GAME_DEF_STATE_ENUM_NONE);
-        stateCommon::addState(statePlayerAssign::loop, GAME_DEF_STATE_PLAYER_ASSIGN);
-        stateCommon::addState(stateMover::loop, GAME_DEF_STATE_MOVER);
         stateCommon::addState(stateBoard::loop, GAME_DEF_STATE_BOARD);
+        stateCommon::addState(stateMover::loop, GAME_DEF_STATE_MOVER);
         stateCommon::addState(stateProgress::loop, GAME_DEF_STATE_PROGRESS);
         stateCommon::addState(stateEnd::loop, GAME_DEF_STATE_END);
         stateCommon::handleStateChange(GAME_DEF_STATE_DEFAULT);
@@ -43,7 +39,7 @@ namespace _main_ {
                 stateCommon::loop(data);
             }
         }
-        stateCommon::LoopData empty{.face=FACE_COUNT, .action=action::Action{.type=GAME_DEF_ACTION_INVALID}};
+        stateCommon::LoopData empty{.face=FACE_COUNT, .action=action::Action{.type=GAME_DEF_ACTION_INVALID, .payload=0}};
         if(!globalEvents::isHandled(empty)) {
             stateCommon::loop(empty);
         }

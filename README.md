@@ -1,4 +1,4 @@
-# Overtake
+# Blinks: Raid
 
 > A Turn Based Strategy Game for [blinks](https://blinks.games/)
 
@@ -23,32 +23,30 @@ Upload via one of the following methods...
 
 ### 📝 Step By Step
 
-1) **Join at least 4 blinks together and long press any one to form the board.** This step can be done at anytime to start over. The board should now be slowly pulsing white.
+1) **Join at least 4 blinks together and long press any one to form the island.** This step can be done at anytime to start over. The island should now be solid green
 
-2) **Double tap any blink on the board.** The board will spin white for a few seconds while it sets up before switching to the first player's color (orange)
+2) **Remove a blink from the island's edge.** This will be the player's viking longship. The longship is lit with the current player color on its active edge. The two flanking white faces vaguely make the longship blink resemble a pointy viking helmet. You can remove more longships for other players or share a single longship. To change the longship player color, tap it once.
 
-3) **Remove a single blink from the board.** This is the player's token and they should hang onto it. Wait for the board to change to the next player color before the next token is removed. The removed player token will radiate its player color on its "active" side. Repeat this step for each player.
+3) **Everyone take a good long look at the island and decide (in secret) where you want to land your longship.** Once everyone has their minds made up, have all players close their eyes.
 
-4) **Double tap a blink on the board and all have all players close their eyes.** The board should now be dark. The board will automatically go dark after 4 players have taken their tokens or if it goes down to 2 blinks. No clicking required.
+4) **Clockwise, one player at a time, open your eyes and make your move by connecting your longship to an unoccupied (green) island edge.** Connect the token using its player color "active" side. The island will blink your color on that face to confirm and then return to green once again. If your all sharing a long ship, give it a tap to move it to the next player color and pass it along. Otherwise, let the next player know its their turn and close your eyes.
+  
+5) **Once all players have moved, everyone should open their eyes. Double tap blink on the island**. The island fill fade in each players new move over a few seconds showing where that players longship landed this turn. Each player's viking hoard will then spread outwards to occupy neighboring spaces.
+    - ✅ **Captured**: Spaces attacked by only a single player token are now occupied by that player. They will pulse the requesting player's color.
+    - ❎ **Contested**: Spaces attacked by more than one player are contested. They will alternate blinking each player's color before disappearing. The space will remain unoccupied.
 
-5) **Clockwise, one player at a time, open your eyes and make your move by connecting your token to an unoccupied (dark) face.** Connect the token using its radiating "active" side. The board will blink your color on that face to confirm and then go dark once again. Announce to the next player that they can move and close your eyes.
+    - ⬅️⬆️➡️ All occupied spaces will then spread their player's armies outwards. To spread, armies capture unoccupied neighbors on the island if a majority of that neighbor's edges are unoccupied or owned by a single player.
+    - 🏘️ Spaces on the island are **neighbors** if they are adjacent to one another on the same blink or connected adjacently between two blinks.
 
-6) **Once all players have moved, everyone should open their eyes. Double tap blink on the board**. The board will blink for a few seconds showing the space for each player's new move and then spread player occupied space outwards.
-    - ✅ **Overtaken**: Spaces requested by only a single player token will be overtaken. They will pulse the requesting player's color. The space is now occupied by that player.
-    - ❎ **Contested**: Spaces requested by more than one player are contested. They will alternate blinking each player's color before disappearing. The space will remain unoccupied.
+6) **Go back to step 3 (with all eyes closed)** if no players admit defeat and there are still unoccupied island edges for players to take moves on.
 
-    - ⬅️⬆️➡️ All occupied spaces will then spread their player color outwards. Spaces spread by overtaking their dark neighbors if a majority of that neighbor's edges are unoccupied or owned by one player.
-    - 🏘️ Spaces on the board are **neighbors** if they are adjacent to one another on the same blink or connected adjacently between two blinks.
-
-7) **Go back to step 5 (with all eyes closed)** if no players admit defeat and there are still unoccupied board edges for players to take moves on.
-
-8) **Otherwise, triple tap the board.** The board will spin red for a few seconds while it totals up the number of spaces occupied by each player. It will then flash the color of the winning player (the one with the most spaces). In the event of a tie it will slowly pulse red.
+7) **Otherwise, triple tap the island.** The island will pulse green for a few seconds while it totals up the number of spaces occupied by each player. The winning player (the one with the most spaces) spaces will flash white. In the event of a tie, all spaces will fade to green for each player.
 
 ### Additional Play Notes
 
 - Never remove any blink that would break the board apart.
 - If, at any point, something goes wrong and a token or the board's colors don't line up, go back to step one.
-- If the game detects an illegal move or any other error condition, it will generally blink red, other than when the game is ending, red indicates something has gone (terribly) wrong.
+- If the game detects an illegal attack on the island (attacking an occupied space or two attacks by one player in the same round) it will blink red in response and reject the attack.
 
 ## Develop
 
@@ -60,16 +58,3 @@ Upload via one of the following methods...
 ### Optionals
 
 - VS Code w/ Microsoft [Arduino plugin](https://marketplace.visualstudio.com/items?itemName=vsciot-vscode.vscode-arduino)
-- g++
-
-`./test/test.cpp` can be used to script scenarios via mock blinklib input. Test scenarios write state and log info to console.
-
-```bash
-sh ./scripts/test.sh
-```
-
-### Global Memory Notes
-
-- Empty Sketch: 334 bytes
-- Low Memory Warning: 256
-- That gives us: 78 bytes to play with!

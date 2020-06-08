@@ -20,7 +20,8 @@ namespace stateBoard {
     bool _isEndInitiator;
     byte _moveIndex;
     byte _viewState;
-    
+    byte fieldOffsets[FACE_COUNT];
+
     void handleEnter() {
         _isEndInitiator = false;
         _moveIndex = 0;
@@ -40,10 +41,13 @@ namespace stateBoard {
         }
     }
 
+    Color getFieldColor(const byte face){
+        return MAKECOLOR_5BIT_RGB(0, fieldOffsets[face], 0);
+    }
     void drawOwners() {
         FOREACH_FACE(f) {
             if(_ownership[f] == PLAYER_LIMIT) {
-                setColorOnFace(COLOR_FIELD, f);
+                setColorOnFace(getFieldColor(f), f);
                 continue;
             }
             setColorOnFace(player::getColor(_ownership[f]), f);
@@ -81,7 +85,7 @@ namespace stateBoard {
             }
             _viewState = VIEW_STATE_RADIATE;
             _playerToFaceRequests[_moveIndex] = data.face;
-            action::broadcast(action::Action{.type=GAME_DEF_ACTION_MOVE_TAKEN, .payload=_moveIndex});
+            action::broadcast(  GAME_DEF_ACTION_MOVE_TAKEN, _moveIndex );
         }
     }
 
@@ -108,7 +112,7 @@ namespace stateBoard {
             return;
         }
         if(buttonMultiClicked()){
-            action::broadcast(action::Action{.type=GAME_DEF_ACTION_END, .payload=millis()});
+            action::broadcast( GAME_DEF_ACTION_END,  millis() );
             _isEndInitiator = true;
             timer::cancel();
             stateCommon::handleStateChange(GAME_DEF_STATE_END);
@@ -119,7 +123,7 @@ namespace stateBoard {
                 stateCommon::handleStateChange(GAME_DEF_STATE_MOVER);
                 return;
             }
-            action::broadcast(action::Action{.type=GAME_DEF_ACTION_PROGRESS, .payload = millis()});
+            action::broadcast(  GAME_DEF_ACTION_PROGRESS,  millis() );
             changeToProgress();
         }
     }
@@ -136,6 +140,7 @@ namespace stateBoard {
     void reset() {
         FOREACH_FACE(f){
             _ownership[f] = PLAYER_LIMIT;
+            fieldOffsets[f] = 9 + ( ( (getSerialNumberByte(f) + millis()) % 4 ) * 6);
         }
     }
 

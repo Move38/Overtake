@@ -14,7 +14,7 @@ namespace stateMover {
     byte _currentPlayer = 0;
 
     void handleDelayedSend() {
-        action::send(action::Action{.type=GAME_DEF_ACTION_MOVE_REQUEST, .payload = _currentPlayer}, 0);
+        action::send( (byte) GAME_DEF_ACTION_MOVE_REQUEST,  _currentPlayer , 0);
     }
     
     void handleViewNormalize() {
@@ -34,14 +34,14 @@ namespace stateMover {
     }
 
     void handlePlayerChange(){
-        if(buttonSingleClicked() && isAlone()) {
+        if(buttonDoubleClicked() && isAlone()) {
             _currentPlayer = (_currentPlayer + 1) % PLAYER_LIMIT;
         }
     }
 
     void loop(const bool isEnter, const stateCommon::LoopData& data) {
         if(isEnter) {
-            buttonSingleClicked();
+            buttonDoubleClicked();
             timer::cancel();
             _viewState = VIEW_IDLE;
             _currentPlayer = 0;
